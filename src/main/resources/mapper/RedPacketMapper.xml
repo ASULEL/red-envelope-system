@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asule.redenvelopesystem.mapper.RedPacketMapper">
+
+    <resultMap id="BaseResultMap" type="com.asule.redenvelopesystem.domain.RedPacket">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+            <result property="totalAmount" column="total_amount" jdbcType="DECIMAL"/>
+            <result property="totalNum" column="total_num" jdbcType="INTEGER"/>
+            <result property="remainingAmount" column="remaining_amount" jdbcType="DECIMAL"/>
+            <result property="remainingNum" column="remaining_num" jdbcType="INTEGER"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="expireTime" column="expire_time" jdbcType="TIMESTAMP"/>
+            <result property="type" column="type" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,user_id,total_amount,
+        total_num,remaining_amount,remaining_num,
+        create_time,expire_time,type
+    </sql>
+</mapper>
