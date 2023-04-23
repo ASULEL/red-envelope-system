@@ -8,6 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -21,7 +22,8 @@ import javax.servlet.http.HttpServletRequest;
  * @Version: 1.0
  * @Description: 文件作用详细描述....
  */
-@RestController("/red-envelop")
+@RequestMapping("/red-envelop")
+@RestController
 @Slf4j
 @Api(tags = "红包相关模块" , value = "发红包抢红包")
 public class RedEnvelopeController {

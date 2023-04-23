@@ -7,6 +7,13 @@ spring:
     url: jdbc:mysql://rm-cn-uqm36mm7r0002jmo.rwlb.rds.aliyuncs.com:3306/redpacket?useSSL=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
     password: Leilei@1
+    # Hikari 连接池配置
+    hikari:
+      minimum-idle: 3  # 最小空闲连接数量
+      maximum-pool-size: 5  # 连接池最大连接数，默认是10
+      max-lifetime: 1800000  # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      connection-test-query: SELECT 1
+
   redis:
     host: r-bp1ro436w8i56cjjmjpd.redis.rds.aliyuncs.com
     password: asule:leilei@1
