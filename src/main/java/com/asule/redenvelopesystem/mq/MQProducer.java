@@ -25,4 +25,8 @@ public class MQProducer {
         log.info("发送消息" + message);
         rabbitTemplate.convertAndSend("red-envelope-exchange", "redEnvelope.message", message);
     }
+    public void sendGrabCoupon(String message) {
+        log.info("发送消息" + message);
+        rabbitTemplate.convertAndSend("coupon-exchange", "coupon.message", message);
+    }
 }

@@ -51,7 +51,8 @@ public class RedRecordServiceImpl extends ServiceImpl<RedRecordMapper, RedRecord
             boolean locked = redisTemplate.opsForValue().setIfAbsent(lockKey, "locked");
             //获取锁失败,说明此次抢购红包没有成功，需要将抢到的金额重新push回redis中，数量也需要加回来
             if (!locked) {
-                redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
+                if (redEnvelope.getType() == 2)
+                    redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
                 redisTemplate.opsForValue().increment("redPocket:" + signal + ":total");
                 return null;
             }
@@ -74,13 +75,15 @@ public class RedRecordServiceImpl extends ServiceImpl<RedRecordMapper, RedRecord
                 );
                 //假设没有更新成功,需要将抢到的金额重新push回redis中,数量也需要加回来
                 if (!flag) {
-                    redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
+                    if (redEnvelope.getType() == 2)
+                        redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
                     redisTemplate.opsForValue().increment("redPocket:" + signal + ":total");
                     return null;
                 }
             } catch (Exception e) {
                 //如果出现异常,需要将抢到的金额重新push回redis中，数量也需要加回来
-                redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
+                if (redEnvelope.getType() == 2)
+                    redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
                 redisTemplate.opsForValue().increment("redPocket:" + signal + ":total");
                 e.printStackTrace();
             }

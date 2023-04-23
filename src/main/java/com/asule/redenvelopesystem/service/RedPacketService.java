@@ -15,4 +15,6 @@ public interface RedPacketService extends IService<RedPacket> {
     CommonResult sendRedEnvelope(String userTicket, RedEnvelopeVo redEnvelopeVo);
 
     CommonResult grabRedEnvelope(String userTicket, String signal);
+
+    CommonResult grabNormalRedEnvelope(String userTicket, String signal);
 }

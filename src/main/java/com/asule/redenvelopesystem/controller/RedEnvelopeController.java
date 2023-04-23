@@ -43,10 +43,12 @@ public class RedEnvelopeController {
 
     @ApiOperation("抢红包模块")
     @PostMapping("/grabRedEnvelope")
-    public CommonResult grabRedEnvelope(HttpServletRequest request, String signal){
+    public CommonResult grabRedEnvelope(HttpServletRequest request, String signal,Integer type){
         //获取cookie
         String userTicket = CookieUtil.getCookieValue(request, "userTicket");
         log.info("userTicket:{},signal:{}",userTicket,signal);
+        if (type == 1)
+            return redPacketService.grabNormalRedEnvelope(userTicket,signal);
         return redPacketService.grabRedEnvelope(userTicket,signal);
     }
 

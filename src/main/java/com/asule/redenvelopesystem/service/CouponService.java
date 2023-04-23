@@ -1,6 +1,9 @@
 package com.asule.redenvelopesystem.service;
 
 import com.asule.redenvelopesystem.domain.Coupon;
+import com.asule.redenvelopesystem.vo.CommonResult;
+import com.asule.redenvelopesystem.vo.CouponVo;
+import com.asule.redenvelopesystem.vo.RedEnvelopeVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,4 +13,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface CouponService extends IService<Coupon> {
 
+    CommonResult sendCoupon(String userTicket, CouponVo couponVo);
+
+    CommonResult grabCoupon(String userTicket, String signal);
 }

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +15,7 @@ import java.util.Date;
  */
 @TableName(value ="coupon")
 @Data
+@Accessors(chain = true)
 public class Coupon implements Serializable {
     /**
      * 代金券ID
@@ -31,10 +33,19 @@ public class Coupon implements Serializable {
      */
     private Integer amount;
 
+    /***
+     * 代金券个数
+     */
+    private Integer totalNum;
+
+    /***
+     *  剩余个数
+     */
+    private Integer remainingNum;
     /**
      * 使用条件
      */
-    private String condition;
+    private String conditions;
 
     /**
      * 代金券红包创建时间
@@ -64,7 +75,7 @@ public class Coupon implements Serializable {
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
             && (this.getUserId() == null ? other.getUserId() == null : this.getUserId().equals(other.getUserId()))
             && (this.getAmount() == null ? other.getAmount() == null : this.getAmount().equals(other.getAmount()))
-            && (this.getCondition() == null ? other.getCondition() == null : this.getCondition().equals(other.getCondition()))
+            && (this.getConditions() == null ? other.getConditions() == null : this.getConditions().equals(other.getConditions()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getEndTime() == null ? other.getEndTime() == null : this.getEndTime().equals(other.getEndTime()));
     }
@@ -76,7 +87,7 @@ public class Coupon implements Serializable {
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
         result = prime * result + ((getUserId() == null) ? 0 : getUserId().hashCode());
         result = prime * result + ((getAmount() == null) ? 0 : getAmount().hashCode());
-        result = prime * result + ((getCondition() == null) ? 0 : getCondition().hashCode());
+        result = prime * result + ((getConditions() == null) ? 0 : getConditions().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getEndTime() == null) ? 0 : getEndTime().hashCode());
         return result;
@@ -91,7 +102,7 @@ public class Coupon implements Serializable {
         sb.append(", id=").append(id);
         sb.append(", userId=").append(userId);
         sb.append(", amount=").append(amount);
-        sb.append(", condition=").append(condition);
+        sb.append(", conditions=").append(conditions);
         sb.append(", createTime=").append(createTime);
         sb.append(", endTime=").append(endTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);

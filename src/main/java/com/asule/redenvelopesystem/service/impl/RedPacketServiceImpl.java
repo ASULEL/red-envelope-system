@@ -43,6 +43,9 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
     private RedisScript<List> script1;
 
     @Resource
+    private RedisScript<List> script2;
+
+    @Resource
     private MQProducer mqProducer;
 
     /**
@@ -65,7 +68,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
             throw new GlobalException(CommonResultEnum.SIGNAL_REPEAT);
         //3.根据红包类型选择发送
         if (redEnvelopeVo.getType() == 1) {
-            return NoLuckLuckRedEnvelope();
+            return NoLuckLuckRedEnvelope(user, redEnvelopeVo, signal);
         } else {
             return LuckRedEnvelope(user, redEnvelopeVo, signal);
         }
@@ -91,8 +94,13 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
      *
      * @return
      */
-    private CommonResult NoLuckLuckRedEnvelope() {
-        return null;
+    private CommonResult NoLuckLuckRedEnvelope(User user,RedEnvelopeVo redEnvelopeVo,String signal) {
+        //1.数据异步入mysql
+        addRedEnvelope(redEnvelopeVo, signal, user);
+        //2.总数和列表入redis
+        String prefix = "redPocket:" + signal;
+        redisTemplate.opsForValue().set(prefix + ":total", redEnvelopeVo.getTotalNum());
+        return CommonResult.success(signal);
     }
 
 
@@ -141,11 +149,12 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
                 .setUserId(user.getPhone())
                 .setTotalAmount(redEnvelopeVo.getTotalAmount())
                 .setTotalNum(redEnvelopeVo.getTotalNum())
-                .setRemainingAmount(redEnvelopeVo.getTotalAmount())
+                .setRemainingAmount(redEnvelopeVo.getType() == 1?redEnvelopeVo.getTotalAmount().multiply(new BigDecimal(redEnvelopeVo.getTotalNum())):redEnvelopeVo.getTotalAmount())
                 .setRemainingNum(redEnvelopeVo.getTotalNum())
                 .setCreateTime(now)
                 .setExpireTime(after24h)
                 .setType(redEnvelopeVo.getType());
+        System.out.println(redPacket);
         return redPacketMapper.insert(redPacket) == 1;
     }
 
@@ -178,7 +187,41 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
             return CommonResult.error(CommonResultEnum.RED_ENVELOPE_EMPTY);
         //4.发送给消息队列减数据库存和金额
         //异步处理，前期大量请求过来可以快速处理，后面消息队列再去慢慢处理，流量削峰
-        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money);
+        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money,2);
+        mqProducer.sendGrabRedEnvelope(JsonUtil.object2JsonStr(grabRedEnvelope));
+        return CommonResult.success(money);
+    }
+
+    /**
+     * 抢普通红包
+     *
+     * @param userTicket
+     * @param signal
+     * @return
+     */
+    @Override
+    public CommonResult grabNormalRedEnvelope(String userTicket, String signal) {
+        //1.判断是否重复抢红包
+        User user = (User) redisTemplate.opsForValue().get("user:" + userTicket);
+        if (user == null)
+            throw new GlobalException(CommonResultEnum.SESSION_ERROR);
+        RedRecord redRecord = (RedRecord) redisTemplate.opsForValue().get("grab:" + user.getPhone() + ":" + signal);
+        if (redRecord != null)
+            return CommonResult.error(CommonResultEnum.GRAB_REPEAT,redRecord);
+        //2.内存标记，这里先不做，这是本地缓存
+        //3.预减库存
+        String prefix = "redPocket:" + signal;
+        List<String> list = Arrays.asList(prefix + ":total");
+        List result = (List) redisTemplate.execute(script2, list, Collections.EMPTY_LIST);
+        Long stock = (Long) result.get(0);
+        //从数据库获取对应设置的红包金额
+        RedPacket redPacket = redPacketMapper.selectById(signal);
+        BigDecimal money = redPacket == null?new BigDecimal(0):redPacket.getTotalAmount();
+        if (stock == 0)
+            return CommonResult.error(CommonResultEnum.RED_ENVELOPE_EMPTY);
+        //4.发送给消息队列减数据库存和金额
+        //异步处理，前期大量请求过来可以快速处理，后面消息队列再去慢慢处理，流量削峰
+        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money,1);
         mqProducer.sendGrabRedEnvelope(JsonUtil.object2JsonStr(grabRedEnvelope));
         return CommonResult.success(money);
     }

@@ -2,11 +2,18 @@ package com.asule.redenvelopesystem.mq;
 
 import com.asule.redenvelopesystem.domain.RedRecord;
 import com.asule.redenvelopesystem.domain.User;
+import com.asule.redenvelopesystem.domain.UserCoupon;
 import com.asule.redenvelopesystem.service.RedRecordService;
+import com.asule.redenvelopesystem.service.UserCouponService;
 import com.asule.redenvelopesystem.util.JsonUtil;
+import com.asule.redenvelopesystem.vo.GrabCoupon;
 import com.asule.redenvelopesystem.vo.GrabRedEnvelope;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.rabbit.annotation.Exchange;
+import org.springframework.amqp.rabbit.annotation.Queue;
+import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -33,6 +40,10 @@ public class MQReceiver {
     @Resource
     private RedisTemplate redisTemplate;
 
+    @Resource
+    private UserCouponService userCouponService;
+
+
 
     /**
      * 抢红包操作
@@ -53,7 +64,8 @@ public class MQReceiver {
                 .eq("user_id", user.getPhone())
         );
         if ( redRecord != null){
-            redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
+            if (redEnvelope.getType() == 2)
+                redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
             redisTemplate.opsForValue().increment("redPocket:" + signal + ":total");
             return;
         }
@@ -61,4 +73,38 @@ public class MQReceiver {
         //抢红包操作
         redRecordService.grab(redEnvelope);
     }
+
+    /**
+     * 抢代金券红包操作
+     *
+     * @param message
+     */
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    value = @Queue(name = "coupon-queue"),
+                    exchange = @Exchange(name = "coupon-exchange",type = ExchangeTypes.TOPIC),
+                    key = "coupon.#"
+            )
+    )
+    public void receiveCoupon(String message) {
+        log.info("接收消息：" + message);
+        GrabCoupon grabCoupon = JsonUtil.jsonStr2Object(message, GrabCoupon.class);
+
+        String signal = grabCoupon.getSignal();
+        User user = grabCoupon.getUser();
+        Integer money = grabCoupon.getMoney();
+        //判断是否重复抢购
+        UserCoupon userCoupon = userCouponService.getOne(new QueryWrapper<UserCoupon>()
+                .eq("coupon_id", signal)
+                .eq("user_id", user.getPhone())
+        );
+        if ( userCoupon != null){
+            redisTemplate.opsForValue().increment("couPon:" + signal + ":total");
+            return;
+        }
+
+        //抢红包操作
+        userCouponService.grab(grabCoupon);
+    }
+
 }

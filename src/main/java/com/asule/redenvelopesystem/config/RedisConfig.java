@@ -47,4 +47,22 @@ public class RedisConfig {
         return redisScript;
     }
 
+    @Bean
+    public DefaultRedisScript<List> script2() {
+        DefaultRedisScript<List> redisScript = new DefaultRedisScript<>();
+        //lock.lua脚本位置和application.yml同级目录
+        redisScript.setLocation(new ClassPathResource("stock2.lua"));
+        redisScript.setResultType(List.class);
+        return redisScript;
+    }
+
+    @Bean
+    public DefaultRedisScript<List> script3() {
+        DefaultRedisScript<List> redisScript = new DefaultRedisScript<>();
+        //lock.lua脚本位置和application.yml同级目录
+        redisScript.setLocation(new ClassPathResource("stock3.lua"));
+        redisScript.setResultType(List.class);
+        return redisScript;
+    }
+
 }

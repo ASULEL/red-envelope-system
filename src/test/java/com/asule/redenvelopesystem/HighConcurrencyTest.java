@@ -173,8 +173,9 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("k-666666,");
-                fw2.write(userTicket + "\n");
+                fw2.write("r-5555,");
+                fw2.write(userTicket);
+                fw2.write(",2" + "\n");
             }
             log.info("***********************登陆成功");
         } catch (Exception e) {
@@ -194,4 +195,87 @@ public class HighConcurrencyTest {
             }
         }
     }
+
+    /**
+     * 抢代金券红包自动测试编写
+     */
+    @Test
+    public void BFSTest2() {
+        FileWriter fw1 = null;
+        FileWriter fw2 = null;
+        try {
+            String path = System.getProperty("user.dir") + "/script/redPacketUser.txt";
+            File file = new File(path);
+            Scanner scanner = new Scanner(file);
+            List<String> strList = new ArrayList<>();
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                strList.add(line);
+            }
+            String[] strArray = strList.stream().toArray(String[]::new);
+
+
+            //File file1 = new File(System.getProperty("user.dir") + "/script/result.txt");
+            //fw1 = new FileWriter(file1);
+            File file2 = new File(System.getProperty("user.dir") + "/script/grabCouponThread.txt");
+            fw2 = new FileWriter(file2);
+            //1.读取用户信息
+            for (int i = 0; i < 100; i++) {
+                String[] splitStr = strArray[i].split(",");
+                User user = new User();
+                user.setPhone(splitStr[0]);
+                user.setPassword(splitStr[1]);
+
+
+                // 请求头设置,x-www-form-urlencoded格式的数据
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                //提交参数设置
+                MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+                map.add("phone", user.getPhone());
+                map.add("password", user.getPassword());
+                // 组装请求体
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+
+                // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
+                //第一种方法
+                CommonResult result = restTemplate.postForObject(URL, request, CommonResult.class);
+                System.out.println(result);
+
+                //第二种方法
+                //ResponseEntity<CommonResult> responseEntity = restTemplate.postForEntity(URL, request , CommonResult.class);
+                //System.out.println(responseEntity);
+
+
+                //2.获取返回结果
+                String userTicket = result.getData().toString();
+                log.info(user.getPhone() + "," + user.getPassword() + "," + userTicket);
+
+                //3.写入登陆过的用户信息
+                //fw1.write(user.getPhone() + ",");
+                //fw1.write(user.getPassword() + ",");
+                //fw1.write(userTicket + "\n");
+                //4.写入将要并发抢红包的线程
+                fw2.write("j-3333,");
+                fw2.write(userTicket+"\n");
+            }
+            log.info("***********************登陆成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fw1 != null)
+                    fw1.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                if (fw2 != null)
+                    fw2.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

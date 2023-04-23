@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,6 +16,7 @@ import java.util.Date;
  */
 @TableName(value ="user_coupon")
 @Data
+@Accessors(chain = true)
 public class UserCoupon implements Serializable {
     /**
      * 记录ID
@@ -26,6 +28,12 @@ public class UserCoupon implements Serializable {
      * 用户ID
      */
     private String userId;
+
+    /***
+     * 代金券红包的ID
+     */
+
+    private String couponId;
 
     /**
      * 代金券金额

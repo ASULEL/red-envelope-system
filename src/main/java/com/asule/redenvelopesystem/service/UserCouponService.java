@@ -1,6 +1,7 @@
 package com.asule.redenvelopesystem.service;
 
 import com.asule.redenvelopesystem.domain.UserCoupon;
+import com.asule.redenvelopesystem.vo.GrabCoupon;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,4 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserCouponService extends IService<UserCoupon> {
 
+    UserCoupon grab(GrabCoupon grabCoupon);
 }
