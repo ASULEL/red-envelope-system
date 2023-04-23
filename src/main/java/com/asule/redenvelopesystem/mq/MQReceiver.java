@@ -44,7 +44,6 @@ public class MQReceiver {
     private UserCouponService userCouponService;
 
 
-
     /**
      * 抢红包操作
      *
@@ -63,7 +62,7 @@ public class MQReceiver {
                 .eq("red_packet_id", signal)
                 .eq("user_id", user.getPhone())
         );
-        if ( redRecord != null){
+        if (redRecord != null) {
             if (redEnvelope.getType() == 2)
                 redisTemplate.opsForList().rightPush("redPocket:" + signal + ":list", money.multiply(new BigDecimal(100)).intValue());
             redisTemplate.opsForValue().increment("redPocket:" + signal + ":total");
@@ -82,7 +81,7 @@ public class MQReceiver {
     @RabbitListener(
             bindings = @QueueBinding(
                     value = @Queue(name = "coupon-queue"),
-                    exchange = @Exchange(name = "coupon-exchange",type = ExchangeTypes.TOPIC),
+                    exchange = @Exchange(name = "coupon-exchange", type = ExchangeTypes.TOPIC),
                     key = "coupon.#"
             )
     )
@@ -92,13 +91,12 @@ public class MQReceiver {
 
         String signal = grabCoupon.getSignal();
         User user = grabCoupon.getUser();
-        Integer money = grabCoupon.getMoney();
         //判断是否重复抢购
         UserCoupon userCoupon = userCouponService.getOne(new QueryWrapper<UserCoupon>()
                 .eq("coupon_id", signal)
                 .eq("user_id", user.getPhone())
         );
-        if ( userCoupon != null){
+        if (userCoupon != null) {
             redisTemplate.opsForValue().increment("couPon:" + signal + ":total");
             return;
         }

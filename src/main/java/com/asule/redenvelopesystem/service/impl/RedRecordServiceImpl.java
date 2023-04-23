@@ -45,6 +45,9 @@ public class RedRecordServiceImpl extends ServiceImpl<RedRecordMapper, RedRecord
         String signal = redEnvelope.getSignal();
         User user = redEnvelope.getUser();
         BigDecimal money = redEnvelope.getMoney();
+        if (redEnvelope.getType() == 1)
+            money = redPacketService.getById(signal).getTotalAmount();
+
 
         String lockKey = "grab_lock:" + signal; //定义分布式锁的key
         try {

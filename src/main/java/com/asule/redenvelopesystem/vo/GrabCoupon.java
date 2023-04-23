@@ -21,8 +21,4 @@ public class GrabCoupon {
      */
     private User user;
 
-    /**
-     * 抢到的金额
-     */
-    private Integer money;
 }

@@ -94,7 +94,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
      *
      * @return
      */
-    private CommonResult NoLuckLuckRedEnvelope(User user,RedEnvelopeVo redEnvelopeVo,String signal) {
+    private CommonResult NoLuckLuckRedEnvelope(User user, RedEnvelopeVo redEnvelopeVo, String signal) {
         //1.数据异步入mysql
         addRedEnvelope(redEnvelopeVo, signal, user);
         //2.总数和列表入redis
@@ -149,7 +149,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
                 .setUserId(user.getPhone())
                 .setTotalAmount(redEnvelopeVo.getTotalAmount())
                 .setTotalNum(redEnvelopeVo.getTotalNum())
-                .setRemainingAmount(redEnvelopeVo.getType() == 1?redEnvelopeVo.getTotalAmount().multiply(new BigDecimal(redEnvelopeVo.getTotalNum())):redEnvelopeVo.getTotalAmount())
+                .setRemainingAmount(redEnvelopeVo.getType() == 1 ? redEnvelopeVo.getTotalAmount().multiply(new BigDecimal(redEnvelopeVo.getTotalNum())) : redEnvelopeVo.getTotalAmount())
                 .setRemainingNum(redEnvelopeVo.getTotalNum())
                 .setCreateTime(now)
                 .setExpireTime(after24h)
@@ -174,7 +174,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
             throw new GlobalException(CommonResultEnum.SESSION_ERROR);
         RedRecord redRecord = (RedRecord) redisTemplate.opsForValue().get("grab:" + user.getPhone() + ":" + signal);
         if (redRecord != null)
-            return CommonResult.error(CommonResultEnum.GRAB_REPEAT,redRecord);
+            return CommonResult.error(CommonResultEnum.GRAB_REPEAT, redRecord);
         //2.内存标记，这里先不做，这是本地缓存
         //3.预减库存
         String prefix = "redPocket:" + signal;
@@ -187,7 +187,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
             return CommonResult.error(CommonResultEnum.RED_ENVELOPE_EMPTY);
         //4.发送给消息队列减数据库存和金额
         //异步处理，前期大量请求过来可以快速处理，后面消息队列再去慢慢处理，流量削峰
-        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money,2);
+        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money, 2);
         mqProducer.sendGrabRedEnvelope(JsonUtil.object2JsonStr(grabRedEnvelope));
         return CommonResult.success(money);
     }
@@ -207,7 +207,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
             throw new GlobalException(CommonResultEnum.SESSION_ERROR);
         RedRecord redRecord = (RedRecord) redisTemplate.opsForValue().get("grab:" + user.getPhone() + ":" + signal);
         if (redRecord != null)
-            return CommonResult.error(CommonResultEnum.GRAB_REPEAT,redRecord);
+            return CommonResult.error(CommonResultEnum.GRAB_REPEAT, redRecord);
         //2.内存标记，这里先不做，这是本地缓存
         //3.预减库存
         String prefix = "redPocket:" + signal;
@@ -215,15 +215,13 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         List result = (List) redisTemplate.execute(script2, list, Collections.EMPTY_LIST);
         Long stock = (Long) result.get(0);
         //从数据库获取对应设置的红包金额
-        RedPacket redPacket = redPacketMapper.selectById(signal);
-        BigDecimal money = redPacket == null?new BigDecimal(0):redPacket.getTotalAmount();
         if (stock == 0)
             return CommonResult.error(CommonResultEnum.RED_ENVELOPE_EMPTY);
         //4.发送给消息队列减数据库存和金额
         //异步处理，前期大量请求过来可以快速处理，后面消息队列再去慢慢处理，流量削峰
-        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, money,1);
+        GrabRedEnvelope grabRedEnvelope = new GrabRedEnvelope(signal, user, null, 1);
         mqProducer.sendGrabRedEnvelope(JsonUtil.object2JsonStr(grabRedEnvelope));
-        return CommonResult.success(money);
+        return CommonResult.success(0);
     }
 
     /**

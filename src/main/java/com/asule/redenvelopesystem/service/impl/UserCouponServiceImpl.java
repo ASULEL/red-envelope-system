@@ -1,22 +1,21 @@
 package com.asule.redenvelopesystem.service.impl;
 
-import com.asule.redenvelopesystem.domain.*;
+import com.asule.redenvelopesystem.domain.Coupon;
+import com.asule.redenvelopesystem.domain.User;
+import com.asule.redenvelopesystem.domain.UserCoupon;
+import com.asule.redenvelopesystem.mapper.UserCouponMapper;
 import com.asule.redenvelopesystem.service.CouponService;
+import com.asule.redenvelopesystem.service.UserCouponService;
 import com.asule.redenvelopesystem.vo.GrabCoupon;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.asule.redenvelopesystem.service.UserCouponService;
-import com.asule.redenvelopesystem.mapper.UserCouponMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -45,7 +44,7 @@ public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCou
     public UserCoupon grab(GrabCoupon grabCoupon) {
         String signal = grabCoupon.getSignal();
         User user = grabCoupon.getUser();
-        Integer money = grabCoupon.getMoney();
+        Integer money = couponService.getById(signal).getAmount();
 
         String lockKey = "grabCoupon_lock:" + signal; //定义分布式锁的key
 
@@ -84,11 +83,7 @@ public class UserCouponServiceImpl extends ServiceImpl<UserCouponMapper, UserCou
 
             //大红包扣减数量
             Coupon coupon = couponService.getById(signal);
-//        BigDecimal remainMoney = redPacket.getRemainingAmount().subtract(money);
-//        System.out.println(remainMoney);
-//        redPacket.setRemainingAmount(remainMoney);
-//        coupon.setRemainingNum(coupon.getRemainingNum() - 1);
-//        couponService.updateById(coupon);
+
 
             //抢到红包的列表增加该用户抢到的值
             UserCoupon userCoupon = new UserCoupon();

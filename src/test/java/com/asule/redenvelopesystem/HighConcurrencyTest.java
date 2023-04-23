@@ -173,7 +173,7 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("r-5555,");
+                fw2.write("d-666666,");
                 fw2.write(userTicket);
                 fw2.write(",2" + "\n");
             }
@@ -256,7 +256,7 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("j-3333,");
+                fw2.write("v-666666,");
                 fw2.write(userTicket+"\n");
             }
             log.info("***********************登陆成功");
@@ -277,5 +277,4 @@ public class HighConcurrencyTest {
             }
         }
     }
-
 }
