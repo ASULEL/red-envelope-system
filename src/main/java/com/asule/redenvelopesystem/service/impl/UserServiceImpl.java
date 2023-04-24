@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 12707
@@ -52,7 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         String userTicket = UUIDUtil.uuid();
 
         //将用户信息存入redis
-        redisTemplate.opsForValue().set("user:" + userTicket, user);
+        redisTemplate.opsForValue().set("user:" + userTicket, user,24, TimeUnit.HOURS);
         CookieUtil.setCookie(request,response,"userTicket",userTicket);
         return CommonResult.success(userTicket);
     }

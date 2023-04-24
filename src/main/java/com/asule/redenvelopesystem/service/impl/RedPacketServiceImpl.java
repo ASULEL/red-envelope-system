@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author 12707
@@ -64,10 +65,12 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         //2.获取红包口令
         String signal = getSignal(redEnvelopeVo.getSignal());
         Integer money = (Integer) redisTemplate.opsForValue().get("redPacket:" + signal + ":total");
+        Integer type = redEnvelopeVo.getType();
         if (money != null)
             throw new GlobalException(CommonResultEnum.SIGNAL_REPEAT);
         //3.根据红包类型选择发送
-        if (redEnvelopeVo.getType() == 1) {
+        redisTemplate.opsForValue().set("type:" + signal,type,24, TimeUnit.HOURS);
+        if (type == 1) {
             return NoLuckLuckRedEnvelope(user, redEnvelopeVo, signal);
         } else {
             return LuckRedEnvelope(user, redEnvelopeVo, signal);
@@ -84,7 +87,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         Random random = new Random();
         char big = (char) (random.nextInt(26) + 65);
         char small = (char) (random.nextInt(26) + 97);
-        int feed = random.nextInt();
+        int feed = random.nextInt(2);
         char prefix = feed == 0 ? big : small;
         return prefix + "-" + signal;
     }
@@ -99,7 +102,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         addRedEnvelope(redEnvelopeVo, signal, user);
         //2.总数和列表入redis
         String prefix = "redPocket:" + signal;
-        redisTemplate.opsForValue().set(prefix + ":total", redEnvelopeVo.getTotalNum());
+        redisTemplate.opsForValue().set(prefix + ":total", redEnvelopeVo.getTotalNum(),24, TimeUnit.HOURS);
         return CommonResult.success(signal);
     }
 
@@ -119,8 +122,9 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         addRedEnvelope(redEnvelopeVo, signal, user);
         //2.总数和列表入redis
         String prefix = "redPocket:" + signal;
-        redisTemplate.opsForValue().set(prefix + ":total", redEnvelopeVo.getTotalNum());
+        redisTemplate.opsForValue().set(prefix + ":total", redEnvelopeVo.getTotalNum(),24, TimeUnit.HOURS);
         redisTemplate.opsForList().leftPushAll(prefix + ":list", list);
+        redisTemplate.expire(prefix + ":list",24,TimeUnit.HOURS);
         return CommonResult.success(signal);
     }
 

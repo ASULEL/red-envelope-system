@@ -42,7 +42,7 @@ class RedEnvelopeSystemApplicationTests {
     @Test
     public void addList(){
         Integer sum = 0;
-        List<Integer> list = redisTemplate.opsForList().range("redPocket:u-666666:list",0,-1);
+        List<Integer> list = redisTemplate.opsForList().range("redPocket:c-666666:list",0,-1);
         for (int i = 0; i < list.size(); i++) {
             sum += list.get(i);
         }

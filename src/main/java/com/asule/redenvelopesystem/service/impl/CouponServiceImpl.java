@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author 12707
@@ -61,7 +62,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
         addCouPon(couponVo, signal, user);
         //2.总数和列表入redis
         String prefix = "couPon:" + signal;
-        redisTemplate.opsForValue().set(prefix + ":total", couponVo.getTotalNum());
+        redisTemplate.opsForValue().set(prefix + ":total", couponVo.getTotalNum(),24, TimeUnit.HOURS);
         return CommonResult.success(signal);
     }
 
@@ -120,7 +121,7 @@ public class CouponServiceImpl extends ServiceImpl<CouponMapper, Coupon>
         Random random = new Random();
         char big = (char) (random.nextInt(26) + 65);
         char small = (char) (random.nextInt(26) + 97);
-        int feed = random.nextInt();
+        int feed = random.nextInt(2);
         char prefix = feed == 0 ? big : small;
         return prefix + "-" + signal;
     }

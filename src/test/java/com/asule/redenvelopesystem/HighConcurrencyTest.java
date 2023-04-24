@@ -42,7 +42,7 @@ public class HighConcurrencyTest {
      * 批量添加数据库用户
      */
     @Test
-    public void addUser(){
+    public void addUser() {
         Connection conn = null;
         PreparedStatement ps = null;
         FileWriter fw1 = null;
@@ -173,9 +173,8 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("d-666666,");
-                fw2.write(userTicket);
-                fw2.write(",2" + "\n");
+                fw2.write("p-666666,");
+                fw2.write(userTicket + "\n");
             }
             log.info("***********************登陆成功");
         } catch (Exception e) {
@@ -256,8 +255,8 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("v-666666,");
-                fw2.write(userTicket+"\n");
+                fw2.write("P-666666,");
+                fw2.write(userTicket + "\n");
             }
             log.info("***********************登陆成功");
         } catch (Exception e) {
