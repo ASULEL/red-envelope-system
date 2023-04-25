@@ -7,6 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +35,7 @@ public class UserController {
 
     @ApiOperation("登陆接口")
     @PostMapping(value = "/doLogin")
-    public CommonResult doLogin(User user, HttpServletRequest request, HttpServletResponse response) {
+    public CommonResult doLogin(@RequestBody User user, HttpServletRequest request, HttpServletResponse response) {
         log.info("{}", user);
         return userService.doLogin(user, request, response);
     }

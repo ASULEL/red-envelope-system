@@ -6,10 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
@@ -145,14 +141,15 @@ public class HighConcurrencyTest {
 
 
                 // 请求头设置,x-www-form-urlencoded格式的数据
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                //HttpHeaders headers = new HttpHeaders();
+                //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 //提交参数设置
-                MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-                map.add("phone", user.getPhone());
-                map.add("password", user.getPassword());
+                //MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+                //map.add("phone", user.getPhone());
+                //map.add("password", user.getPassword());
+
                 // 组装请求体
-                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+                HttpEntity<User> request = new HttpEntity<>(user);
 
                 // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
                 //第一种方法
@@ -173,7 +170,7 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("p-666666,");
+                fw2.write("I-666666,");
                 fw2.write(userTicket + "\n");
             }
             log.info("***********************登陆成功");
@@ -227,14 +224,14 @@ public class HighConcurrencyTest {
 
 
                 // 请求头设置,x-www-form-urlencoded格式的数据
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+                //HttpHeaders headers = new HttpHeaders();
+                //headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
                 //提交参数设置
-                MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-                map.add("phone", user.getPhone());
-                map.add("password", user.getPassword());
+                //MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+                //map.add("phone", user.getPhone());
+                //map.add("password", user.getPassword());
                 // 组装请求体
-                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
+                HttpEntity<User> request = new HttpEntity<>(user);
 
                 // 发送post请求，并打印结果，以String类型接收响应结果JSON字符串
                 //第一种方法
@@ -255,7 +252,7 @@ public class HighConcurrencyTest {
                 //fw1.write(user.getPassword() + ",");
                 //fw1.write(userTicket + "\n");
                 //4.写入将要并发抢红包的线程
-                fw2.write("P-666666,");
+                fw2.write("q-666666,");
                 fw2.write(userTicket + "\n");
             }
             log.info("***********************登陆成功");

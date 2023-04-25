@@ -8,9 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +36,7 @@ public class RedEnvelopeController {
 
     @ApiOperation("发红包模块")
     @PostMapping("/sendRedEnvelope")
-    public CommonResult sendRedEnvelope(HttpServletRequest request, RedEnvelopeVo redEnvelopeVo){
+    public CommonResult sendRedEnvelope(HttpServletRequest request, @RequestBody RedEnvelopeVo redEnvelopeVo){
         //获取cookie
         String userTicket = CookieUtil.getCookieValue(request, "userTicket");
         log.info("userTicket:{},redEnvelopeVo:{}",userTicket,redEnvelopeVo);
@@ -46,7 +44,7 @@ public class RedEnvelopeController {
     }
 
     @ApiOperation("抢红包模块")
-    @PostMapping("/grabRedEnvelope")
+    @GetMapping("/grabRedEnvelope")
     public CommonResult grabRedEnvelope(HttpServletRequest request, String signal){
         //获取cookie
         String userTicket = CookieUtil.getCookieValue(request, "userTicket");
